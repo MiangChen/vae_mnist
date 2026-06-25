@@ -5,7 +5,11 @@
 右边是在 2 维 `z` 网格上解码出的图像流形——对应教材图 16.6(a)(b)。
 训练收敛后自动合成一段 mp4(默认 10fps,即每帧 0.1s)。
 
-![示例帧](docs/sample_frame.png)
+![学习过程](docs/demo.gif)
+
+> 上图为 **Conv-64(最优配置)** 的学习过程:左边隐空间里的样本逐渐按数字分簇,
+> 右边解码流形随之成形。完整成片见 `vae_latent_learning_conv64_best.mp4`。
+> (GitHub README 不支持直接播放 mp4,故以 GIF 展示;末帧静态图见 `docs/sample_frame.png`。)
 
 ## 环境(uv)
 
