@@ -18,14 +18,39 @@ uv pip install numpy matplotlib imageio imageio-ffmpeg scikit-learn
 
 ## 运行
 
+**推荐配置(扫描实验得到的最优,隐空间最干净):**
+
 ```bash
-python train.py --epochs 250 --batch 10240 --ch 256 --snap-every 8 --lr 3e-3 --out runs/main
+python train.py --ch 64 --epochs 60 --batch 1024 --snap-every 18 --lr 1e-3 --out runs/conv64
 ```
 
-产物在 `runs/main/`:
-- `vae_latent_learning.mp4` —— 学习过程视频
-- `frames/` —— 每一帧 PNG
-- `vae_final.pt` —— 训练好的权重
+吃满显存的大模型版(显存利用率优先,但隐空间更糊):
+
+```bash
+python train.py --ch 256 --epochs 250 --batch 10240 --snap-every 8 --lr 3e-3 --out runs/main
+```
+
+产物在 `runs/<name>/`:`vae_latent_learning.mp4`(学习过程视频)、`frames/`(每帧 PNG)、`vae_final.pt`(权重)。
+
+仓库根目录附两段成片:
+- `vae_latent_learning_conv64_best.mp4` —— **推荐**:Conv-64(0.885M),隐空间分簇清晰;
+- `vae_latent_learning_conv256_big.mp4` —— 大模型 Conv-256(13.76M),显存拉满但隐空间糊。
+
+## 参数量扫描结论(`sweep.py`)
+
+按 **生成质量(测试 ELBO↓)+ 编码质量(隐空间 kNN 准确率↑)** 综合评估 10 档模型:
+
+| 排名 | 模型 | 参数量 | ELBO↓ | kNN↑ | 综合分 |
+|---|---|---|---|---|---|
+| 🥇 1 | **Conv-64** | **0.885M** | 144.7 | **0.779** | **0.968** |
+| 2 | MLP-1024 | 3.71M | 143.9 | 0.762 | 0.940 |
+| 3 | Conv-32 | 0.23M | 145.4 | 0.764 | 0.885 |
+| 8 | Conv-256 | 13.76M | 150.1 | 0.733 | 0.593 |
+| 10 | MLP-64 | 0.11M | 156.6 | 0.637 | 0.000 |
+
+**结论:最优参数量 ≈ 0.9M(Conv-64),甜区 0.2–1M;最大的 Conv-256(13.76M)反而排第 8** ——
+2 维隐空间下容量过剩不仅无益、还轻微伤泛化。完整数据见 `docs/sweep_results.json`,
+10 组隐空间对比见 `docs/latent_compare.png`。复现:`python sweep.py`。
 
 ## 主要参数
 

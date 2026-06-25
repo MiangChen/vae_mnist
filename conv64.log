@@ -1,0 +1,11 @@
+IMAGEIO FFMPEG_WRITER WARNING: input image is not divisible by macro_block_size=16, resizing from (1080, 503) to (1088, 512) to ensure video compatibility with most codecs and players. To prevent resizing, make your input image divisible by the macro_block_size or set the macro_block_size to 1 (risking incompatibility).
+[init] params=0.88M  batch=1024  ch=64  steps/epoch=59
+[ep   1] step    59 recon  175.91 KL  4.351 |   2.6s | peakVRAM 1.2GB | frames 4
+[ep  10] step   590 recon  145.89 KL  5.821 |   8.9s | peakVRAM 1.2GB | frames 33
+[ep  20] step  1180 recon  140.17 KL  6.262 |  16.1s | peakVRAM 1.2GB | frames 66
+[ep  30] step  1770 recon  140.79 KL  6.414 |  23.2s | peakVRAM 1.2GB | frames 99
+[ep  40] step  2360 recon  133.75 KL  6.725 |  30.4s | peakVRAM 1.2GB | frames 132
+[ep  50] step  2950 recon  132.03 KL  6.716 |  37.3s | peakVRAM 1.2GB | frames 164
+[ep  60] step  3540 recon  129.27 KL  6.764 |  44.5s | peakVRAM 1.2GB | frames 197
+[video] writing 197 frames -> runs/conv64/vae_latent_learning.mp4 @ 10fps
+[done] 46.3s  video=runs/conv64/vae_latent_learning.mp4  ckpt=runs/conv64/vae_final.pt
