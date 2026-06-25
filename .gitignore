@@ -4,3 +4,5 @@ __pycache__/
 runs/
 runs_main.log
 data/
+
+*.log
