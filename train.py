@@ -79,7 +79,7 @@ def vae_loss(logits, x, mu, logvar, beta):
 # ----------------------------- 可视化 -----------------------------
 @torch.no_grad()
 def render_frame(model, vis_x, vis_y, step, epoch, recon, kl, path,
-                 grid_n=20, z_lim=3.0, scatter_lim=4.0, device="cuda", amp_dt=torch.bfloat16):
+                 grid_n=20, z_lim=3.0, scatter_lim=4.0, device="cuda", amp_dt=torch.bfloat16, dpi=90):
     model.eval()
     # 左:隐空间散点(用固定的一批测试样本,编码取均值)
     with torch.autocast("cuda", dtype=amp_dt):
@@ -112,7 +112,7 @@ def render_frame(model, vis_x, vis_y, step, epoch, recon, kl, path,
     fig.suptitle(f"epoch {epoch:3d} | step {step:5d} | recon {recon:7.2f} | KL {kl:6.3f}",
                  fontsize=13)
     fig.tight_layout()
-    fig.savefig(path, dpi=90)
+    fig.savefig(path, dpi=dpi)
     plt.close(fig)
     model.train()
 
@@ -132,6 +132,7 @@ def main():
     ap.add_argument("--n-vis",  type=int, default=5000, help="散点图用多少测试样本")
     ap.add_argument("--fps",    type=int, default=10, help="视频帧率(10=每帧0.1s)")
     ap.add_argument("--seed",   type=int, default=0)
+    ap.add_argument("--dpi",    type=int, default=90, help="每帧渲染 DPI(越高越清晰)")
     args = ap.parse_args()
 
     torch.manual_seed(args.seed); np.random.seed(args.seed)
@@ -163,7 +164,7 @@ def main():
     frame_paths = []
     # 训练前先截一帧(随机初始化的样子)
     f0 = os.path.join(frame_dir, f"frame_{0:06d}.png")
-    render_frame(model, vis_x, vis_y, 0, 0, 0.0, 0.0, f0, device=device, amp_dt=amp_dt)
+    render_frame(model, vis_x, vis_y, 0, 0, 0.0, 0.0, f0, device=device, amp_dt=amp_dt, dpi=args.dpi)
     frame_paths.append(f0)
 
     t0 = time.time()
@@ -182,7 +183,7 @@ def main():
             if step % args.snap_every == 0:
                 fp = os.path.join(frame_dir, f"frame_{step:06d}.png")
                 render_frame(model, vis_x, vis_y, step, epoch, recon.item(), kl.item(),
-                             fp, device=device, amp_dt=amp_dt)
+                             fp, device=device, amp_dt=amp_dt, dpi=args.dpi)
                 frame_paths.append(fp)
         if epoch == 1 or epoch % 10 == 0 or epoch == args.epochs:
             mem = torch.cuda.max_memory_allocated()/1e9
